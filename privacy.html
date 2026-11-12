@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Политика конфиденциальности — Clipboard</title>
+<meta name="description" content="Политика конфиденциальности расширения Clipboard - Local & Private: локальное хранение в IndexedDB, отсутствие серверов, телеметрии и обоснование разрешений.">
+<link rel="icon" href="img/icon-32.png">
+<style>
+@font-face{font-family:Tiny5Mono;src:url(fonts/Tiny5Mono-Regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:Tiny5Mono;src:url(fonts/Tiny5Mono-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
+:root{--bg:#0b0700;--surf:#130d02;--surf2:#1f1503;--well:#080500;--line:#3a2605;--line2:#6b4809;--acc:#ffb000;--acc2:#ffd061;--mut:#c98a00;--dim:#a87300;--ink:#0b0700;--glow:0 0 6px rgba(255,176,0,.5)}
+*{box-sizing:border-box;margin:0;padding:0;border-radius:0}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{background:var(--bg);color:var(--acc);font:19px/1.65 "Tiny5Mono",ui-monospace,Consolas,monospace;text-shadow:var(--glow);overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:90;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.65))}
+body::after{content:"";position:fixed;left:0;right:0;top:-150px;height:150px;pointer-events:none;z-index:89;background:linear-gradient(180deg,transparent,rgba(255,176,0,.04),transparent);animation:sweep 9s linear infinite}
+a{color:var(--acc2);text-decoration:none}
+a:hover{text-decoration:underline}
+.pixel-icon,.logo img{image-rendering:pixelated;image-rendering:crisp-edges}
+.wrap{max-width:1150px;margin:0 auto;padding:0 25px}
+header{position:sticky;top:0;z-index:50;background:rgba(19,13,2,.94);border-bottom:2px solid var(--line2);backdrop-filter:blur(2px)}
+header .wrap{max-width:1350px;display:flex;align-items:center;gap:22px;height:72px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:22.5px;letter-spacing:.04em;color:var(--acc);text-shadow:0 0 9px rgba(255,176,0,.8);text-decoration:none}
+.logo:hover{text-decoration:none}
+.logo img{width:32px;height:32px}
+.pill{font-size:14px;border:1px solid var(--mut);background:#2a1a02;padding:1px 9px}
+nav{margin-left:auto;display:flex;gap:8px;align-items:center}
+nav a{padding:6px 14px;border:1px solid transparent;color:var(--mut);font-size:16px}
+nav a:hover{border-color:var(--line2);color:var(--acc);text-decoration:none}
+.btn{display:inline-flex;align-items:center;gap:10px;font:700 16px "Tiny5Mono",monospace;letter-spacing:.04em;padding:8px 18px;border:2px solid var(--acc);background:var(--acc);color:var(--ink);text-shadow:none}
+.btn:hover{background:var(--acc2);text-decoration:none}
+main{padding:60px 0 80px}
+.kicker{display:inline-flex;align-items:center;gap:10px;color:var(--mut);font-size:16px;margin-bottom:15px}
+.kicker img{width:20px;height:20px}
+h1{font-size:clamp(32px,5vw,50px);line-height:1.15;text-shadow:0 0 12px rgba(255,176,0,.75);margin-bottom:15px}
+.meta{color:var(--dim);font-size:16px;margin-bottom:35px}
+.summary{background:var(--surf);border:2px solid var(--acc);padding:22px 25px;margin-bottom:40px;box-shadow:0 0 24px rgba(255,176,0,.18)}
+.summary p{color:var(--acc2);font-size:19px}
+.toc{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:42px}
+.toc a{border:1px solid var(--line2);background:var(--surf);padding:6px 14px;font-size:16px;color:var(--mut)}
+.toc a:hover{border-color:var(--acc);color:var(--acc);text-decoration:none}
+section{padding:35px 0;border-top:1px dashed var(--line2)}
+h2{font-size:28px;margin-bottom:18px;text-shadow:0 0 8px rgba(255,176,0,.6)}
+h2::before{content:"> ";color:var(--mut)}
+p{color:var(--mut);margin-bottom:15px}
+ul{list-style:none;margin:10px 0 15px}
+ul li{position:relative;padding:6px 0 6px 22px;color:var(--mut)}
+ul li::before{content:">";position:absolute;left:0;color:var(--acc)}
+code{background:#2a1a02;border:1px solid var(--line2);padding:1px 8px;color:var(--acc2);font-size:16px}
+.perms{width:100%;border-collapse:collapse;margin:15px 0;background:var(--well);border:1px solid var(--line2)}
+.perms th,.perms td{padding:14px 18px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:16px}
+.perms th{background:var(--surf);color:var(--acc);border-bottom:2px solid var(--line2)}
+.perms td{color:var(--mut)}
+.perms td:first-child{white-space:nowrap;color:var(--acc2)}
+.note{background:var(--surf);border:1px solid var(--line2);padding:20px 22px;margin-top:15px}
+footer{border-top:2px solid var(--line2);background:var(--surf);padding:35px 0 45px;color:var(--dim);font-size:15px}
+footer .wrap{max-width:1350px;display:flex;gap:25px;flex-wrap:wrap;justify-content:space-between}
+footer a{color:var(--dim)}
+footer a:hover{color:var(--acc)}
+@keyframes sweep{to{transform:translateY(140vh)}}
+@media(max-width:720px){
+  body{font-size:16px}
+  header .wrap{height:60px}
+  .logo{font-size:19px}
+  .logo img{width:26px;height:26px}
+  nav a:not(.btn){display:none}
+  .pill{display:none}
+  .wrap{padding:0 14px}
+  main{padding:34px 0 50px}
+  .perms,.perms thead,.perms tbody,.perms tr,.perms td,.perms th{display:block;width:100%}
+  .perms thead{display:none}
+  .perms tr{border-bottom:1px solid var(--line2);padding:8px 0}
+  .perms td{border:none;padding:4px 12px}
+  .perms td:first-child{padding-bottom:2px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="index.html"><img src="img/icon-32.png" alt="">CLIPBOARD<span class="pill">v1.2.0</span></a>
+  <nav>
+    <a href="index.html">На главную</a>
+    <a href="index.html#features">Возможности</a>
+    <a href="index.html#faq">Вопросы</a>
+    <a class="btn" href="index.html#install">Установить</a>
+  </nav>
+</div></header>
+
+<main><div class="wrap">
+  <div class="kicker"><img src="img/lock.png" class="pixel-icon" width="16" height="16" alt=""><span>Clipboard - Local &amp; Private · v1.2.0</span></div>
+  <h1>Политика конфиденциальности</h1>
+  <p class="meta">Дата обновления: 12 ноября 2026 · Распространяется на расширение для Chrome, Edge, Brave, Opera, Яндекс Браузера и сборку для Firefox.</p>
+
+  <div class="summary">
+    <p>Расширение хранит историю буфера обмена и настройки только локально в IndexedDB вашего браузера. Разработчик не имеет сервера, базы пользователей, аккаунтов, аналитики и рекламы, поэтому ваши записи не покидают компьютер.</p>
+  </div>
+
+  <div class="toc">
+    <a href="#stored">Что и где хранится</a>
+    <a href="#capture">Когда срабатывает сохранение</a>
+    <a href="#network">Сетевые запросы</a>
+    <a href="#permissions">Зачем нужны разрешения</a>
+    <a href="#control">Управление и удаление данных</a>
+    <a href="#contacts">Контакты</a>
+  </div>
+
+  <section id="stored">
+    <h2>Что и где хранится</h2>
+    <p>Все данные расширения записываются в локальную базу <code>LocalClipboardDB</code> в IndexedDB вашего браузера с запросом <code>navigator.storage.persist()</code>, чтобы браузер не очистил историю автоматически при нехватке места.</p>
+    <ul>
+      <li>Текст и ссылки, которые вы скопировали, добавили вручную или сохранили через контекстное меню.</li>
+      <li>Изображения и видеофайлы (вместе с миниатюрой для отображения в списке).</li>
+      <li>URL исходной страницы (<code>sourceUrl</code>) для записей, сохранённых через контекстное меню, и только внутри той же локальной базы.</li>
+      <li>Настройки расширения: режим открытия (оверлей, боковая панель или попап), автозахват, порог архивации, сжатие WebP, срок автоудаления и список исключённых доменов.</li>
+    </ul>
+    <p>Данные не выгружаются в облако и не синхронизируются между устройствами.</p>
+  </section>
+
+  <section id="capture">
+    <h2>Когда срабатывает сохранение и что игнорируется</h2>
+    <ul>
+      <li>При копировании на странице (<code>Ctrl+C</code> / событие <code>copy</code>), если в настройках включён автозахват.</li>
+      <li>При открытии окна или попапа расширения: подхватываются текущие текст и картинка из системного буфера обмена, если они ещё не сохранены.</li>
+      <li>По вашему явному действию: ручной ввод, перетаскивание файла, вставка через <code>Ctrl+V</code> внутри попапа или пункт контекстного меню правой кнопки мыши.</li>
+      <li>Содержимое полей ввода пароля (<code>input[type="password"]</code>) игнорируется при копировании и при отслеживании активного поля для вставки.</li>
+      <li>На доменах и поддоменах из вашего списка исключений автоматическое сохранение полностью отключается.</li>
+    </ul>
+  </section>
+
+  <section id="network">
+    <h2>Сетевые запросы и третьи лица</h2>
+    <p>Расширение не отправляет пользовательские данные на серверы разработчика, в рекламные сети, трекеры или сервисы аналитики.</p>
+    <p>Единственный момент, когда расширение обращается к сети — это скачивание выбранной вами картинки или видео по команде из контекстного меню («Сохранить картинку в Clipboard» / «Сохранить видео в Clipboard»). Запрос уходит напрямую на адрес медиафайла на сайте; для картинок выставляется <code>credentials: 'omit'</code>, чтобы не передавать cookies, а результат сразу записывается в локальную IndexedDB.</p>
+  </section>
+
+  <section id="permissions">
+    <h2>Зачем нужны разрешения браузера</h2>
+    <table class="perms">
+      <thead>
+        <tr><th>Разрешение</th><th>Назначение в коде</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>storage</code>, <code>unlimitedStorage</code></td><td>Локальное хранение текста, изображений, видео и настроек в IndexedDB без жёсткого лимита квоты под медиафайлы.</td></tr>
+        <tr><td><code>clipboardRead</code></td><td>Чтение текста и изображений из системного буфера обмена при открытии попапа или оверлея.</td></tr>
+        <tr><td><code>clipboardWrite</code></td><td>Копирование выбранного текста или картинки обратно в системный буфер обмена по клику или нажатию Enter.</td></tr>
+        <tr><td><code>contextMenus</code></td><td>Добавление пунктов «Сохранить выделение / картинку / видео / ссылку» и «Открыть Clipboard» в меню правой кнопки мыши.</td></tr>
+        <tr><td><code>activeTab</code>, <code>tabs</code></td><td>Проверка домена текущей вкладки для списка исключений и вставки/открытия окна по <code>Alt+V</code>. История посещений нигде не ведётся.</td></tr>
+        <tr><td><code>scripting</code></td><td>Показ плавающего окна <code>Alt+V</code> на вкладках, открытых до установки или обновления расширения.</td></tr>
+        <tr><td><code>sidePanel</code></td><td>Открытие менеджера в боковой панели Chrome по кнопке в шапке или настройке режима по умолчанию.</td></tr>
+        <tr><td><code>&lt;all_urls&gt;</code></td><td>Работа горячей клавиши <code>Alt+V</code> на любой веб-странице и загрузка выбранного пользователем медиафайла через контекстное меню.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="control">
+    <h2>Управление, сжатие и удаление данных</h2>
+    <ul>
+      <li>Удаление отдельных записей кнопкой корзины в карточке.</li>
+      <li>Массовая очистка в настройках: «Очистить незакреплённые» или «Очистить ВСЮ историю».</li>
+      <li>Автоархивация и срок хранения: старые незакреплённые фото могут сжиматься локально в WebP через <code>OffscreenCanvas</code>, а при заданном сроке в днях незакреплённые записи удаляются автоматически. Закреплённые записи не удаляются и не сжимаются.</li>
+      <li>Резервная копия: экспорт в JSON-файл и импорт обратно выполняются только по вашей команде и работают с файлами на вашем диске.</li>
+      <li>При удалении расширения из браузера база <code>LocalClipboardDB</code> стирается с устройства полностью.</li>
+    </ul>
+  </section>
+
+  <section id="contacts">
+    <h2>Контакты и исходный код</h2>
+    <p>Исходный код открыт для проверки. Вопросы о приватности и сообщения об ошибках можно оставить в репозитории проекта:</p>
+    <div class="note">
+      <div>Репозиторий: <a href="https://github.com/dressky/clipboard">https://github.com/dressky/clipboard</a></div>
+      <div>Обращения (Issues): <a href="https://github.com/dressky/clipboard/issues">https://github.com/dressky/clipboard/issues</a></div>
+    </div>
+  </section>
+</div></main>
+
+<footer><div class="wrap">
+  <span>© Clipboard · Локальный и приватный</span>
+  <span><a href="index.html">Главная</a> · <a href="index.html#install">Установить</a> · <a href="PRIVACY.md">Версия в Markdown</a></span>
+</div></footer>
+</body>
+</html>
