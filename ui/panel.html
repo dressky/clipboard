@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clipboard - Local Storage</title>
+  <link rel="icon" type="image/png" href="../icons/icon-32.png">
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title"><img src="../icons/pixel/png/clipboard.png" class="pixel-icon pixel-icon-header" alt="" /> CLIPBOARD</h1>
+      </div>
+      <div class="header-right">
+        <button class="btn-icon" id="open-sidepanel-btn" title="Открыть в боковой панели (Side Panel)"><img src="../icons/pixel/png/sidepanel.png" class="pixel-icon pixel-icon-btn" alt="Side Panel" /></button>
+        <button class="btn-icon" id="open-settings-btn" title="Настройки"><img src="../icons/pixel/png/gear.png" class="pixel-icon pixel-icon-btn" alt="Settings" /></button>
+      </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Поиск по истории..." autofocus autocomplete="off" />
+      <button class="btn-clear" id="search-clear-btn" title="Очистить поиск" style="display: none;">✕</button>
+    </div>
+
+    <!-- Filter Buttons -->
+    <nav class="filter-nav">
+      <button class="filter-btn active" data-filter="all">ВСЕ</button>
+      <button class="filter-btn" data-filter="text">ТЕКСТ</button>
+      <button class="filter-btn" data-filter="image">ФОТО</button>
+      <button class="filter-btn" data-filter="video">ВИДЕО</button>
+      <button class="filter-btn" data-filter="pinned"><img src="../icons/pixel/png/pin.png" class="pixel-icon pixel-icon-tab" alt="" /> ЗАКРЕП</button>
+      <button class="filter-btn" data-filter="archived"><img src="../icons/pixel/png/archive.png" class="pixel-icon pixel-icon-tab" alt="" /> АРХИВ</button>
+    </nav>
+
+    <!-- Manual Quick Add Area -->
+    <div class="quick-add-area">
+      <div class="quick-add-input-wrapper">
+        <input type="text" id="quick-text-input" placeholder="Добавить запись вручную..." />
+        <label class="btn-icon" style="cursor: pointer;" title="Загрузить фото/видео с диска">
+          <input type="file" id="file-upload-input" accept="image/*,video/*" style="display: none;" />
+          <img src="../icons/pixel/png/image.png" class="pixel-icon" style="width: 16px; height: 16px;" alt="📁" />
+        </label>
+        <button class="btn-primary" id="quick-add-btn">ДОБАВИТЬ</button>
+      </div>
+    </div>
+
+    <!-- Main Items Feed -->
+    <main class="items-feed" id="items-feed">
+      <div class="empty-state">Загрузка данных...</div>
+    </main>
+
+    <!-- Footer Status -->
+    <footer class="app-footer">
+      <span class="storage-stats" id="storage-stats-label">0 зап. • 0 МБ</span>
+      <span class="footer-hint"><kbd>Alt+V</kbd> оверлей</span>
+    </footer>
+
+    <!-- Media Lightbox / Video Player Modal -->
+    <div class="modal-backdrop" id="media-modal" style="display: none;">
+      <div class="modal-content media-modal-content">
+        <div class="modal-header">
+          <h3 id="media-modal-title">ПРОСМОТР МЕДИА</h3>
+          <button class="btn-close" id="media-modal-close">✕</button>
+        </div>
+        <div class="media-modal-body" id="media-modal-body">
+          <!-- Dynamic media insertion -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-backdrop" id="settings-modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>НАСТРОЙКИ CLIPBOARD</h3>
+          <button class="btn-close" id="settings-close-btn">✕</button>
+        </div>
+        <div class="settings-body">
+          <div class="setting-item">
+            <label class="setting-label">Где открывать по умолчанию:</label>
+            <select id="setting-display-mode" class="setting-select">
+              <option value="floating">Всплывающее окно на странице</option>
+              <option value="sidepanel">Боковая панель Chrome (Side Panel)</option>
+              <option value="popup">Попап в тулбаре браузера</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <label class="setting-checkbox-label">
+              <input type="checkbox" id="setting-auto-capture" />
+              <span>Автосохранение при копировании (Ctrl+C в браузере)</span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <label class="setting-label">Порог активных записей перед архивацией:</label>
+            <input type="number" id="setting-max-active" min="10" max="500" value="50" class="setting-number" />
+            <small class="setting-hint">Записи старше этого количества сжимаются (WebP для фото) и уходят в архив.</small>
+          </div>
+
+          <div class="setting-item">
+            <label class="setting-checkbox-label">
+              <input type="checkbox" id="setting-compression" checked />
+              <span>Сжатие архивных фото в WebP для экономии диска</span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <label class="setting-label">Автоудаление незакрепленных записей (дней, 0 = никогда):</label>
+            <input type="number" id="setting-retention" min="0" max="3650" value="0" class="setting-number" />
+            <small class="setting-hint">Закрепленные записи не удаляются никогда.</small>
+          </div>
+
+          <div class="setting-item">
+            <label class="setting-label">Не сохранять автоматически на сайтах (по одному в строке):</label>
+            <textarea id="setting-excluded" rows="3" class="setting-number" style="width:100%;resize:vertical;" placeholder="bank.example.com"></textarea>
+            <small class="setting-hint">Подходят и поддомены. Ручное сохранение через меню работает везде.</small>
+          </div>
+
+          <div class="setting-item">
+            <label class="setting-label">Резервная копия:</label>
+            <div class="setting-actions">
+              <button class="btn-primary" id="export-btn">Экспорт в файл</button>
+              <label class="btn-primary" style="cursor:pointer;">Импорт<input type="file" id="import-input" accept="application/json,.json" style="display:none;" /></label>
+            </div>
+            <small class="setting-hint">Файл содержит все записи, включая фото и видео. Хранится только у вас.</small>
+          </div>
+
+          <hr class="setting-divider" />
+
+          <div class="setting-actions">
+            <button class="btn-danger" id="clear-unpinned-btn">Очистить незакрепленные</button>
+            <button class="btn-danger-outline" id="clear-all-btn">Очистить ВСЮ историю</button>
+          </div>
+
+          <div class="privacy-note">
+            <span class="privacy-badge"><img src="../icons/pixel/png/lock.png" class="pixel-icon pixel-icon-xs" alt="" /> 100% ЛОКАЛЬНО:</span> Все записи сохраняются на вашем диске в хранилище IndexedDB браузера и защищены от стирания при перезагрузке ПК. Ни один байт не отправляется в сеть.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="app-toast" id="app-toast"></div>
+  </div>
+
+  <script src="../lib/db.js"></script>
+  <script src="panel.js"></script>
+</body>
+</html>

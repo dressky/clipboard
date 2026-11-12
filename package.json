@@ -1,0 +1,31 @@
+{
+  "name": "clipboard-local-private",
+  "version": "1.2.0",
+  "description": "Локальный менеджер буфера обмена для Chrome и Firefox: текст, ссылки, изображения и видео с хранением только на устройстве.",
+  "license": "MIT",
+  "author": "dressky",
+  "homepage": "https://github.com/dressky/clipboard",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dressky/clipboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dressky/clipboard/issues"
+  },
+  "scripts": {
+    "test": "node tests/run-all.js",
+    "package": "node tools/package-stores.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "clipboard",
+    "browser-extension",
+    "chrome-extension",
+    "firefox-addon",
+    "manifest-v3",
+    "local-first",
+    "privacy"
+  ]
+}
