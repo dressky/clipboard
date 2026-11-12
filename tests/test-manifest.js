@@ -86,7 +86,11 @@ manifest.content_scripts.forEach(cs => {
 });
 const panelJsSrc = fs.readFileSync(path.join(EXT_DIR, 'ui', 'panel.js'), 'utf8');
 assert(!/\.innerHTML\s*=/.test(panelJsSrc), 'ui/panel.js must not assign .innerHTML directly');
-console.log('✓ Content scripts & UI JS verified (no unsafe innerHTML assignments)');
+const csSrc = fs.readFileSync(path.join(EXT_DIR, 'content', 'content-script.js'), 'utf8');
+assert(/!e\.ctrlKey\s*&&\s*!e\.metaKey/.test(csSrc), 'content-script.js Alt+V shortcut must ignore Ctrl/Meta modifiers');
+const panelCssSrc = fs.readFileSync(path.join(EXT_DIR, 'ui', 'panel.css'), 'utf8');
+assert(/@media\s*\(min-width:\s*450px\)/.test(panelCssSrc), 'ui/panel.css must expand beyond 440x580 in side panel and standalone window');
+console.log('✓ Content scripts & UI JS/CSS verified (no unsafe innerHTML assignments, responsive sizing, safe shortcut)');
 
 // 7. Validate UI entry points
 assert(manifest.action && manifest.action.default_popup, 'default_popup missing');

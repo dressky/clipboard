@@ -55,9 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // CRT power-on animation
   playPixelEntrance(document.querySelector('.app-container'));
 
-  // Auto-sync system clipboard (both images and text)
+  // Auto-sync system clipboard (both images and text) when autoCapture is enabled
   try {
-    if (navigator.clipboard) {
+    const autoCaptureEnabled = (await db.getSetting('autoCapture')) !== false;
+    if (autoCaptureEnabled && navigator.clipboard) {
       if (navigator.clipboard.read) {
         try {
           const clipItems = await navigator.clipboard.read();
@@ -66,12 +67,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (imgType) {
               const blob = await it.getType(imgType);
               if (blob && blob.size > 0) {
-                await db.addItem({
-                  type: 'image',
-                  blob,
-                  mimeType: blob.type || 'image/png',
-                  title: `Фото (${Math.round(blob.size / 1024)} КБ)`
-                });
+                const recentImgs = await db.getItems({ filter: 'image', limit: 1 });
+                const mime = blob.type || 'image/png';
+                const isDup = recentImgs.length > 0 && recentImgs[0].size === blob.size && recentImgs[0].mimeType === mime;
+                if (!isDup) {
+                  await db.addItem({
+                    type: 'image',
+                    blob,
+                    mimeType: mime,
+                    title: `Фото (${Math.round(blob.size / 1024)} КБ)`
+                  });
+                }
               }
             }
           }
@@ -410,7 +416,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (full && full.blob) {
             const url = URL.createObjectURL(full.blob);
             const imgEl = card.querySelector('.card-thumbnail');
-            if (imgEl) imgEl.src = url;
+            if (imgEl) {
+              imgEl.onload = () => URL.revokeObjectURL(url);
+              imgEl.onerror = () => URL.revokeObjectURL(url);
+              imgEl.src = url;
+            } else {
+              URL.revokeObjectURL(url);
+            }
           }
         }).catch(() => {});
       }

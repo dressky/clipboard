@@ -386,21 +386,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         case 'AUTO_CAPTURE_IMAGE': {
           const itemType = message.itemType === 'video' ? 'video' : 'image';
-          if (!message.manual && await isCaptureBlocked(sender)) {
-            sendResponse({ success: false, reason: 'excluded site' });
-            break;
+          if (!message.manual) {
+            const autoCapture = (await db.getSetting('autoCapture')) !== false;
+            if (!autoCapture || await isCaptureBlocked(sender)) {
+              sendResponse({ success: false, reason: 'disabled or excluded site' });
+              break;
+            }
           }
           if (message.dataUrl) {
             try {
-              // Deduplication check: if recent active image matches size within 15 seconds
-              if (itemType === 'image') {
+              // Deduplication check for automatic clipboard sync: skip if latest image has identical size
+              if (!message.manual && itemType === 'image') {
                 const recent = await db.getItems({ filter: 'image', limit: 1 });
                 if (recent.length > 0 && Math.abs((recent[0].size || 0) - (message.size || 0)) < 10) {
-                  const timeDiff = Date.now() - recent[0].createdAt;
-                  if (timeDiff < 15000) {
-                    sendResponse({ success: true, duplicate: true });
-                    break;
-                  }
+                  sendResponse({ success: true, duplicate: true });
+                  break;
                 }
               }
 

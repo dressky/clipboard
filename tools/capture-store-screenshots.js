@@ -182,7 +182,7 @@ function connectCdp(wsUrl) {
           itemType: 'image',
           dataUrl,
           mimeType: 'image/png',
-          title: 'terminal-preview.png (18 КБ)'
+          title: 'terminal-preview.png'
         });
 
         const addQuick = async (val) => {
@@ -248,6 +248,7 @@ function connectCdp(wsUrl) {
     try { server.close(); } catch (e) {}
     setTimeout(() => {
       try { fs.rmSync(TEMP_PROFILE, { recursive: true, force: true }); } catch (e) {}
+      process.exit(0);
     }, 500);
   }
 })();

@@ -44,7 +44,7 @@
 
   // 1. In-page Hotkey listener for Alt+V (supports both English and Russian layouts)
   window.addEventListener('keydown', (e) => {
-    if (e.altKey && (e.code === 'KeyV' || e.key.toLowerCase() === 'v' || e.key.toLowerCase() === 'м')) {
+    if (e.altKey && !e.ctrlKey && !e.metaKey && (e.code === 'KeyV' || e.key.toLowerCase() === 'v' || e.key.toLowerCase() === 'м')) {
       e.preventDefault();
       e.stopPropagation();
       togglePanel();
@@ -1033,12 +1033,16 @@
         } else {
           const res = await chrome.runtime.sendMessage({ type: 'GET_ITEM_BLOB', id: item.id });
           if (res && res.success && res.dataUrl) {
+            const blobResp = await fetch(res.dataUrl);
+            const blob = await blobResp.blob();
+            const objUrl = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = res.dataUrl;
+            a.href = objUrl;
             a.download = `video_${item.id}.mp4`;
             document.body.appendChild(a);
             a.click();
             a.remove();
+            setTimeout(() => URL.revokeObjectURL(objUrl), 10000);
             closePanel();
             showToast('✓ Видео сохранено на диск');
           }

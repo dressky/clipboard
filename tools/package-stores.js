@@ -148,7 +148,9 @@ console.log('    STORE PACKAGING AUTOMATION (CHROME & FIREFOX)   ');
 console.log('====================================================\n');
 
 const baseFiles = collectFiles(ROOT, INCLUDE_PATHS);
-const chromeManifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.json'), 'utf8'));
+const manifestPath = path.join(ROOT, 'manifest.json');
+const manifestMtime = fs.statSync(manifestPath).mtime;
+const chromeManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
 // 1. Chrome Web Store build
 const chromeZip = path.join(DIST, `clipboard-chrome-v${chromeManifest.version}.zip`);
@@ -156,7 +158,7 @@ if (fs.existsSync(chromeZip)) fs.unlinkSync(chromeZip);
 
 writeZip(chromeZip, [
   ...baseFiles,
-  { name: 'manifest.json', data: Buffer.from(JSON.stringify(chromeManifest, null, 2) + '\n', 'utf8'), mtime: new Date() }
+  { name: 'manifest.json', data: Buffer.from(JSON.stringify(chromeManifest, null, 2) + '\n', 'utf8'), mtime: manifestMtime }
 ]);
 console.log(`✓ Chrome Web Store build ready: ${chromeZip} (${(fs.statSync(chromeZip).size / 1024).toFixed(1)} KB)`);
 
@@ -194,7 +196,7 @@ if (fs.existsSync(firefoxZip)) fs.unlinkSync(firefoxZip);
 
 writeZip(firefoxZip, [
   ...baseFiles,
-  { name: 'manifest.json', data: Buffer.from(JSON.stringify(firefoxManifest, null, 2) + '\n', 'utf8'), mtime: new Date() }
+  { name: 'manifest.json', data: Buffer.from(JSON.stringify(firefoxManifest, null, 2) + '\n', 'utf8'), mtime: manifestMtime }
 ]);
 console.log(`✓ Firefox AMO build ready: ${firefoxZip} (${(fs.statSync(firefoxZip).size / 1024).toFixed(1)} KB)`);
 
